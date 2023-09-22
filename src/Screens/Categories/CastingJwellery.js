@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Image, TouchableOpacity, ScrollView, FlatList, Modal, ImageBackground , SafeAreaView } from 'react-native'
+import { View, Text, Image, TouchableOpacity, ScrollView, FlatList, Modal, ImageBackground, SafeAreaView } from 'react-native'
 import { StyleSheet } from 'react-native';
 import { height, moderateScale, moderateScaleVertical, textScale } from '../../utils/responsive'
 import axios from 'axios';
@@ -40,7 +40,7 @@ const CastingJwellery = ({ navigation }) => {
       title: "Tops",
     },
     {
-      img: require('../../assets/PRODUCTS/CHAINS/Categories/castingJewellery/tops.jpg'),
+      img: require('../../assets/MoodShots/13.jpg'),
       onPress: () => {
         navigation.navigate("GodPendents");
       },
@@ -88,16 +88,16 @@ const CastingJwellery = ({ navigation }) => {
   };
 
   return (
-    
-    <SafeAreaView style={{flex:1}}>
+
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ backgroundColor: "#1A2228", flex: 1 }}>
         <View>
           <Image source={require("../../assets/GOLDEN-STRIP.png")} style={styles.goldenStrip} />
         </View>
-<ScrollView>
-            {/* FlatList */}
-            
-            <View style={{ marginBottom: moderateScaleVertical(50) }}>
+        <ScrollView>
+          {/* FlatList */}
+
+          <View style={{ marginBottom: moderateScaleVertical(50) }}>
             <FlatList contentContainerStyle={{ alignItems: "center" }}
               data={CastingData}
               numColumns={2}
@@ -114,9 +114,9 @@ const CastingJwellery = ({ navigation }) => {
                 </View>
               }
             />
-            </View>
-            </ScrollView>
-       
+          </View>
+        </ScrollView>
+
 
         {/* Whatsapp Help Button*/}
 
@@ -155,7 +155,7 @@ const CastingJwellery = ({ navigation }) => {
           </View>
         </ImageBackground>
       </View>
-      </SafeAreaView>
+    </SafeAreaView>
   )
 }
 

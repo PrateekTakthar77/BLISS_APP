@@ -22,7 +22,7 @@
 //             const response = await axios.get(PREMIUM_API_URL);
 //             setPremiumData(response.data);
 //             console.log("helllllllllloooooo", response.data, )
-        
+
 //         } catch (error) {
 //             console.error('Error fetching premium data:', error);
 //         }
@@ -90,9 +90,9 @@
 //                 <View>
 //                     {/* <View style={{marginBottom:moderateScaleVertical(30)}}> */}
 
-                    
+
 //                     <View style={{ backgroundColor: "#E8E8E8", alignSelf: "center", width: moderateScaleVertical(380), borderRadius: 20, marginTop: moderateScaleVertical(30) }}>
-                  
+
 //                         <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: moderateScaleVertical(20) }}>
 //                             <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(10), width: moderateScale(100), }}>  Product</Text>
 //                             <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(-10) }}>       Qty.</Text>
@@ -162,7 +162,7 @@
 //                                             <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(40), marginLeft: moderateScale(-10) }}>{cartItem.item.mcharges}</Text>
 //                                             {/* <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(80), marginRight: moderateScale(-10) }}>Rs. {GrandTotal.toFixed(2)}</Text> */}
 //                                             <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(90), marginRight: moderateScale(-40) }}>{NetGoldWeight.toFixed(2)} gm</Text>
-                                            
+
 //                                               </View>
 //                                               {/* <View style={styles.Productline}></View> */}
 //                                                </View>)
@@ -171,7 +171,7 @@
 //                                <View>
 //                                <View style={styles.Productline}></View>
 
-                              
+
 //                                <View style={{marginTop:moderateScaleVertical(10), marginLeft:moderateScale(20) , marginBottom:moderateScaleVertical(10)}}>
 //                                     <Text>Tentative price = Rs. {parseFloat(totalWeight + GoldFineRate).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
 //                                     {/* console.log({totalWeight + GoldFineRate}) */}
@@ -404,23 +404,93 @@
 
 
 
-import React, { useState, useEffect } from 'react'
+import React, { useContext, useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-import { View, Text, ImageBackground, Modal, StyleSheet, TouchableOpacity, Image, ScrollView , SafeAreaView} from 'react-native'
+import { View, Text, ImageBackground, Modal, StyleSheet, TouchableOpacity, Image, ScrollView, SafeAreaView } from 'react-native'
 import { moderateScale, moderateScaleVertical, height, textScale } from '../utils/responsive'
 import SimpleModal from './SimpleModal'
 import axios from 'axios';
 import MarqueeView from 'react-native-marquee-view';
 // import { useSelector, useDispatch } from 'react-redux';
 import { getUserDetailsActionCreator } from '../redux/Formdetails/formDetails.action-creator';
+import { AuthContext } from '../Screens/AuthContext';
+import { BASE_URL } from "../Screens/config";
 
 const ConfirmOrder = ({ navigation }) => {
 
+    // ashjsdakj
+    const { logout, userToken, userInfo } = useContext(AuthContext);
 
-    var totalWeight=0;
-    var ftotalWeight=0;
+    const { payload: user } = userInfo;
+    const userDetails = useSelector(state => state.userDetailsData);
+    console.log(`qweouqwiwiwiiwiwiwiiwiiwiiwdjie`, userDetails);
+    console.log('Confirm Order screen userinfo', userInfo._id);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        if (userDetails && !userDetails.brandName) {
+            console.log('Confirm Order screen userinfo', userInfo._id);
+            dispatch(getUserDetailsActionCreator(userInfo._id, userToken));
+        }
+    }, []);
+    const { cart, cartDetails } = useSelector((state) => state.reducer);
+    // console.log(`confirm order`, cart)
+    console.log(`ahskhadshakhsaksadhsdh`, cart)
+    // console.log(`tentententen`,)
+    // const dispatch = useDispatch();
+
+
+    const newArray = cart.map(item => ({
+        quantity: item.count,
+        product: item.id,
+    }));
+
+    console.log(`2222222222222222222222222222222222222222222222222222222222222222222222222222222222222eeeeeeeeeeeeee`, newArray)
+
+    const requestData = {
+        user: userInfo._id, // Replace with the actual user ID
+        items: newArray,
+        address: {
+            addressLine: userDetails.address,
+            pincode: userDetails.pincode,
+            city: userDetails.locality,
+            // area: 'Area Name',
+            // country: 'Country Name',
+            state: userDetails.state,
+        },
+        status: 'pending', // Set the desired status
+        total: 0, // Replace with the desired total amount
+        // orderId: 'your_order_id', // Replace with a unique order ID
+    };
+
+    //     {
+    //         Response: { "message": "Order created successfully", "order": { "__v": 0, "_id": "650d7f041e578db610b75f46", "address": { "addressLine": "Delhi", "city": "Saket", "pincode": "123456", "state": "Delhi" }, "createdAt": "2023-09-22T11:48:20.517Z", "items": [[Object]], "orderId": "9083eeb7-9c03-40cb-884f-3f55a11182da", "status": "pending", "timeCreated": "2023-09-22T11:48:20.517Z", "total": 0, "updatedAt": "2023-09-22T11:48:20.517Z", "user": "64e33d5aba910884e21879d9" } }
+    //  LOG  11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+    //     }
+
+    //     [{ "count": 1, "id": "64ed8c381e47a63d2d6422ab", "item": { "__v": 0, "_id": "64ed8c381e47a63d2d6422ab", "brand": "", "category": "Chain", "color": "", "description": "", "gemstones": [Array], "images": [Array], "material": "Gold", "mcharges": 3.5, "mrp": 1000, "name": "Silky Rope 5.270", "price": 1000, "purity": "18", "reviews": [Array], "size": "", "subcategory": "Silky Rope", "weight": "5.270" } }, { "count": 1, "id": "64ef2597fbc7b247440d2b83", "item": { "__v": 0, "_id": "64ef2597fbc7b247440d2b83", "brand": "", "category": "Plain Jewellery", "color": "", "description": "", "gemstones": [Array], "images": [Array], "material": "Gold", "mcharges": 4.5, "mrp": 1000, "name": "Ladies Ring 3.070", "price": 1000, "purity": "20", "reviews": [Array], "size": "", "subcategory": "Handmade Ladies Ring", "weight": "3.070" } }]
+
+    const checkout = () => {
+        axios.post(`${BASE_URL}api/checkouts/direct`, requestData)
+            .then(response => {
+                // Handle the successful response here
+                console.log('Response:', response.data);
+                console.log('11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111')
+                if (response.status === 201) {
+                    // Navigate to the next screen
+                    navigation.navigate('thank'); // Replace 'NextScreen' with your screen name
+                }
+            })
+            .catch(error => {
+                // Handle any errors that occur during the request
+                console.error('Error:', error);
+            });
+    }
+
+
+    var totalWeight = 0;
+    var ftotalWeight = 0;
     var GoldFineRate = 0;
-    var Gold995= 0;
+    var Gold995 = 0;
 
     // API FOR PREMIUM PRICE
 
@@ -432,7 +502,7 @@ const ConfirmOrder = ({ navigation }) => {
             const response = await axios.get(PREMIUM_API_URL);
             setPremiumData(response.data);
             // console.log("helllllllllloooooo", response.data, )
-        
+
         } catch (error) {
             console.error('Error fetching premium data:', error);
         }
@@ -449,7 +519,7 @@ const ConfirmOrder = ({ navigation }) => {
     const API_URL = 'https://rappid.in/apis/mcx.php?key=9015790532';
     const firstData = apiDATA.data && apiDATA.data[0];
     const secondData = apiDATA.data && apiDATA.data[2];
-    console.log("heloooo" ,firstData )
+    // console.log("heloooo", firstData)
 
     const fetchAPIData = async () => {
         try {
@@ -463,12 +533,12 @@ const ConfirmOrder = ({ navigation }) => {
 
     useEffect(() => {
         fetchAPIData();
-        const interval = setInterval(fetchAPIData, 10 * 60 * 1000);
+        const interval = setInterval(fetchAPIData, 5 * 1000);
 
 
         return () => {
             clearInterval(interval);
-            console.log('APIcalled after every 10 mins');
+            // console.log('APIcalled after every 5 seconds');
         };
     }, []);
 
@@ -486,255 +556,253 @@ const ConfirmOrder = ({ navigation }) => {
     }
     // WhatsApp
 
-    const { cart, cartDetails } = useSelector((state) => state.reducer);
-    console.log(`confirm order`, cart)
-    // const dispatch = useDispatch();
+
     const { total, grandTotal } = cartDetails;
     return (
-        <SafeAreaView style={{flex:1}}>
-        <ImageBackground style={{ flex: 1 }} source={require("../assets/background-image2.png")}>
-            <View style={{}}>
-                <Image source={require("../assets/GOLDEN-STRIP.png")} style={styles.goldenStrip} />
-            </View>
-            <ScrollView>
-                <View>
-                    {/* <View style={{marginBottom:moderateScaleVertical(30)}}> */}
+        <SafeAreaView style={{ flex: 1 }}>
+            <ImageBackground style={{ flex: 1 }} source={require("../assets/background-image2.png")}>
+                <View style={{}}>
+                    <Image source={require("../assets/GOLDEN-STRIP.png")} style={styles.goldenStrip} />
+                </View>
+                <ScrollView>
+                    <View>
+                        {/* <View style={{marginBottom:moderateScaleVertical(30)}}> */}
 
-                    
-            <View style={{ backgroundColor: "#E8E8E8", alignSelf: "center", width: moderateScaleVertical(380), borderRadius: 20, marginTop: moderateScaleVertical(30) , alignItems:"center" }}>
-                  <View style={{width:moderateScale(378),}}>
-                        <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: moderateScaleVertical(20) }}>
-                            <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(10), width: moderateScale(100), }}>  Product</Text>
-                            <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(-10) }}>       Qty.</Text>
-                            <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(-20) }}>                Purity</Text>
-                            <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(-20) }}>                  Weight  </Text>
-                            <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(-5) }}>            Making</Text>
-                            <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginRight: moderateScale(20) }}>            Nt Gold Wt.</Text> 
-                        </View>
-                        {/* map */}
-                                  {
-                                     cart?.length ? cart?.map(cartItem => {
-                                       console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~") 
-                                        let productname= cartItem.item.name
-                                        console.log("Product Name = ", productname )
+
+                        <View style={{ backgroundColor: "#E8E8E8", alignSelf: "center", width: moderateScaleVertical(380), borderRadius: 20, marginTop: moderateScaleVertical(30), alignItems: "center" }}>
+                            <View style={{ width: moderateScale(378), }}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: moderateScaleVertical(20) }}>
+                                    <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(10), width: moderateScale(100), }}>  Product</Text>
+                                    <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(-10) }}>       Qty.</Text>
+                                    <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(-20) }}>                Purity</Text>
+                                    <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(-20) }}>                  Weight  </Text>
+                                    <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginLeft: moderateScale(-5) }}>            Making</Text>
+                                    <Text style={{ color: "black", fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold", marginRight: moderateScale(20) }}>            Nt Gold Wt.</Text>
+                                </View>
+                                {/* map */}
+                                {
+                                    cart?.length ? cart?.map(cartItem => {
+                                        // console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                                        let productname = cartItem.item.name
+                                        // console.log("Product Name = ", productname)
                                         let goldprice = parseFloat(firstData?.SELL);
-                                        console.log("MCX Gold Buy price = ", firstData?.SELL)
-                                        {/* console.log(typeof goldprice) */}
+                                        // console.log("MCX Gold Buy price = ", firstData?.SELL)
+                                        {/* console.log(typeof goldprice) */ }
 
                                         let PremiumCharges = premiumData[0]?.premiumcharges;
-                                        console.log("Premium Charges =" , PremiumCharges)
+                                        // console.log("Premium Charges =", PremiumCharges)
 
-                                        let totalOFGoldandPremium= (goldprice + PremiumCharges )/10;
-                                        console.log("MCX Gold Buy price + Premium Charges =" , totalOFGoldandPremium)
+                                        let totalOFGoldandPremium = (goldprice + PremiumCharges) / 10;
+                                        // console.log("MCX Gold Buy price + Premium Charges =", totalOFGoldandPremium)
 
-                                        let threePercentGstofTotal =( totalOFGoldandPremium * 3) / 100 ;
-                                        console.log("3 % GST Of ( MAX of Gold  + premium Charges) = " , threePercentGstofTotal)
+                                        let threePercentGstofTotal = (totalOFGoldandPremium * 3) / 100;
+                                        // console.log("3 % GST Of ( MAX of Gold  + premium Charges) = ", threePercentGstofTotal)
 
-                                        Gold995= (threePercentGstofTotal + totalOFGoldandPremium)
-                                        console.log("Gold 995 price including 3 % GST =" , Gold995)
+                                        Gold995 = (threePercentGstofTotal + totalOFGoldandPremium)
+                                        // console.log("Gold 995 price including 3 % GST =", Gold995)
 
-                                        {/* Fine Gold Rate */}
-                                        console.log("------Fine Gold Rate")
-                                        let fivePercentOfGold995 = (Gold995 * 0.5)/ 100;
-                                        console.log("0.5 % of GOLD 995 =" ,fivePercentOfGold995)
+                                        {/* Fine Gold Rate */ }
+                                        // console.log("------Fine Gold Rate")
+                                        let fivePercentOfGold995 = (Gold995 * 0.5) / 100;
+                                        // console.log("0.5 % of GOLD 995 =", fivePercentOfGold995)
 
                                         GoldFineRate = (Gold995 + fivePercentOfGold995);
-                                        console.log( "Fine Gold rates = GOLD 995 + (0.5 % of GOLD 995) =" , GoldFineRate)
+                                        // console.log("Fine Gold rates = GOLD 995 + (0.5 % of GOLD 995) =", GoldFineRate)
 
 
-                                        console.log("------Net Gold Weight")
+                                        // console.log("------Net Gold Weight")
 
                                         {/* weight of a product */ }
                                         let productWeight = cartItem.item.weight
-                                        console.log("Weight of a product =", productWeight)
+                                        // console.log("Weight of a product =", productWeight)
 
                                         let WeightintoProduct = cartItem.item.weight * cartItem.count
-                                        console.log("Quantity of Product" , WeightintoProduct)
+                                        // console.log("Quantity of Product", WeightintoProduct)
 
                                         const purity = cartItem.item.purity == 18 ? 75.5 : cartItem.item.purity == 20 ? 83.5 : cartItem.item.purity == 22 ? 92 : 0;
 
-                                        console.log("Purity OF Product =", purity);
+                                        // console.log("Purity OF Product =", purity);
 
-                                        {/* let making = cartItem.item?.mcharges?.replace('%', '') */}
-                                        console.log(discountPercent);
+                                        {/* let making = cartItem.item?.mcharges?.replace('%', '') */ }
+                                        // console.log(discountPercent);
                                         let making = cartItem.item.mcharges;
-                                        console.log("Making Charges =" ,making)
+                                        // console.log("Making Charges =", making)
 
-                                        {/* let NetGoldWeight = (purity + making) / 100 * productWeight; */}
+                                        {/* let NetGoldWeight = (purity + making) / 100 * productWeight; */ }
                                         let NetGoldWeight = (purity + making) / 100 * WeightintoProduct;
-                                        console.log("Net Gold Weight = (purity + making) / 100 * Product Weight =" , NetGoldWeight)
+                                        // console.log("Net Gold Weight = (purity + making) / 100 * Product Weight =", NetGoldWeight)
 
                                         totalWeight += parseFloat(NetGoldWeight.toFixed(2));
-                                        console.log("Total of Net Gold Weight =" ,totalWeight )
+                                        // console.log("Total of Net Gold Weight =", totalWeight)
 
-                                         let TentativePrice = (totalWeight * GoldFineRate).toFixed(2);
-                                         console.log("Tentative Price = Total of Net Gold Weight * Fine Gold Rate =",TentativePrice  )
+                                        let TentativePrice = (totalWeight * GoldFineRate).toFixed(2);
+                                        // console.log("Tentative Price = Total of Net Gold Weight * Fine Gold Rate =", TentativePrice)
 
-                                         {/* ------Discount if product greater than 10 lakhs */}
-{/* --------------------               console.log('DISCOUNT', TentativePrice >= 1000000 && TentativePrice <2500000 ? 0.1 : TentativePrice >= 2500000 ? 0.2 : 0);  */}
-{/* -------After------------- */}    
+                                        {/* ------Discount if product greater than 10 lakhs */ }
+                                        {/* --------------------               console.log('DISCOUNT', TentativePrice >= 1000000 && TentativePrice <2500000 ? 0.1 : TentativePrice >= 2500000 ? 0.2 : 0);  */ }
+                                        {/* -------After------------- */ }
 
-                                        let discountPercent = TentativePrice >= 1000000 && TentativePrice <2500000 ? 0.1 : TentativePrice >= 2500000 ? 0.2 : 0;
+                                        let discountPercent = TentativePrice >= 1000000 && TentativePrice < 2500000 ? 0.1 : TentativePrice >= 2500000 ? 0.2 : 0;
                                         let fmaking = cartItem.item.mcharges - (discountPercent * cartItem.item.mcharges);
                                         let fNetGoldWeight = (purity + fmaking) / 100 * WeightintoProduct;
 
                                         ftotalWeight += parseFloat(fNetGoldWeight.toFixed(2));
 
-                                         let fTentativePrice = (ftotalWeight * GoldFineRate).toFixed(2);
+                                        let fTentativePrice = (ftotalWeight * GoldFineRate).toFixed(2);
 
-                                             return (
-                                                <View style={{ marginBottom: moderateScaleVertical(10), marginTop: moderateScaleVertical(-10) }}>
-                                                   <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: moderateScaleVertical(20) }}>
-                                                       <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(70), marginLeft: moderateScale(-10) }} >{cartItem.item.name}</Text>
-                                                       <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(30), marginLeft: moderateScale(-30) }}>   {cartItem.count}</Text>
-                                                       <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(40), marginLeft: moderateScale(-15) }}> {cartItem.item.purity} KT</Text>
-                                                       {/* <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(80), marginLeft: moderateScale(-10) }}>{cartItem.item.weight} gm</Text> */}
-                                                       <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(80), marginLeft: moderateScale(-10) }}>{WeightintoProduct.toFixed(2)} gm</Text>
-                                                       <View style={{flexDirection:"row"}}>
-                                                       <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(40), marginLeft: moderateScale(-10) ,textDecorationLine: 'line-through'}}>{cartItem.item.mcharges}</Text>
-                                                       <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(40), marginLeft: moderateScale(-10) }}>/</Text>
-                                                       <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(40), marginLeft: moderateScale(-10) }}>{cartItem.item.mcharges - (discountPercent*cartItem.item.mcharges)}</Text>
-                                                       </View>
-                                                       <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(90), marginRight: moderateScale(-40) }}>{NetGoldWeight.toFixed(2)} gm</Text>     
-                                                   </View>
-                                                   <View style={styles.Productline}></View>
-                                                </View>)
-                                                    }) : <></>
-                                                 }
-                                                 <View style={{backgroundColor:"#A8A8A8", width:"100%" , height:moderateScaleVertical(20), padding:2}}>
-                                                 <MarqueeView speed={0.2}> 
-                                                  <View>
-                                                    <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1",}}> Gold995 rate : Rs. {Gold995.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}  | Fine Gold Rate : Rs. {GoldFineRate.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                                        return (
+                                            <View style={{ marginBottom: moderateScaleVertical(10), marginTop: moderateScaleVertical(-10) }}>
+                                                <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: moderateScaleVertical(20) }}>
+                                                    <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(70), marginLeft: moderateScale(-10) }} >{cartItem.item.name}</Text>
+                                                    <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(30), marginLeft: moderateScale(-30) }}>   {cartItem.count}</Text>
+                                                    <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(40), marginLeft: moderateScale(-15) }}> {cartItem.item.purity} KT</Text>
+                                                    {/* <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(80), marginLeft: moderateScale(-10) }}>{cartItem.item.weight} gm</Text> */}
+                                                    <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(80), marginLeft: moderateScale(-10) }}>{WeightintoProduct.toFixed(2)} gm</Text>
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(40), marginLeft: moderateScale(-10), textDecorationLine: 'line-through' }}>{cartItem.item.mcharges}</Text>
+                                                        <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(40), marginLeft: moderateScale(-10) }}>/</Text>
+                                                        <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(40), marginLeft: moderateScale(-10) }}>{cartItem.item.mcharges - (discountPercent * cartItem.item.mcharges)}</Text>
                                                     </View>
-                                                 </MarqueeView>
-                                                    </View>
-                                                 <View style={{marginTop:moderateScaleVertical(5), marginLeft:moderateScale(2) , marginBottom:moderateScaleVertical(10)}}>
-                                                   <Text style={{fontSize:textScale(14), fontFamily:"HurmeGeometricSans1"}}>Tentative price:</Text>
-                                                   <View style={{ flexDirection: "row"}}>
-                                                    <Text style={{}}>Before Discount : </Text>
-                                                   <Text style={{}}>Rs. </Text>
-                                                   <Text style={{textDecorationLine: 'line-through'}}>{parseFloat(totalWeight * GoldFineRate).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                                                   </View>
-                                                    <Text>After Discount : Rs. {parseFloat(ftotalWeight * GoldFineRate).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                                                   
-                                                  
-                                                 </View>
-                 </View>
-            </View>
-                    <View style={styles.WastageChartButton}>
-                        <TouchableOpacity activeOpacity={0.8} onPress={() => {
-                            navigation.navigate('thank');    
-                        }}>
-                            <Text style={styles.buttontext}>CONFIRM  ORDER</Text>
-                        </TouchableOpacity>
+                                                    <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", width: moderateScale(90), marginRight: moderateScale(-40) }}>{NetGoldWeight.toFixed(2)} gm</Text>
+                                                </View>
+                                                <View style={styles.Productline}></View>
+                                            </View>)
+                                    }) : <></>
+                                }
+                                <View style={{ backgroundColor: "#A8A8A8", width: "100%", height: moderateScaleVertical(20), padding: 2 }}>
+                                    <MarqueeView speed={0.2}>
+                                        <View>
+                                            <Text style={{ color: "black", fontSize: textScale(12), fontFamily: "HurmeGeometricSans1", }}> Gold995 rate : Rs. {Gold995.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}  | Fine Gold Rate : Rs. {GoldFineRate.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                                        </View>
+                                    </MarqueeView>
+                                </View>
+                                <View style={{ marginTop: moderateScaleVertical(5), marginLeft: moderateScale(2), marginBottom: moderateScaleVertical(10) }}>
+                                    <Text style={{ fontSize: textScale(14), fontFamily: "HurmeGeometricSans1" }}>Tentative price:</Text>
+                                    <View style={{ flexDirection: "row" }}>
+                                        <Text style={{}}>Before Discount : </Text>
+                                        <Text style={{}}>Rs. </Text>
+                                        <Text style={{ textDecorationLine: 'line-through' }}>{parseFloat(totalWeight * GoldFineRate).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                                    </View>
+                                    <Text>After Discount : Rs. {parseFloat(ftotalWeight * GoldFineRate).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+
+
+                                </View>
+                            </View>
+                        </View>
+                        <View style={styles.WastageChartButton}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={                             // navigation.navigate('thank');
+                                checkout
+                            }>
+                                <Text style={styles.buttontext}>CONFIRM  ORDER</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
 
-                <View style={styles.ProductLogoBackground}>
-                <Text style={{marginLeft:moderateScale(10) , marginTop:moderateScaleVertical(15) , fontSize:textScale(20) ,fontFamily: "HurmeGeometricSans1SemiBold" }}>Disclaimer : </Text>
-                <Text style={{marginLeft:moderateScale(10) , marginTop:moderateScaleVertical(6),  fontSize:textScale(14) ,fontFamily: "HurmeGeometricSans1SemiBold" }}>For gold price inquiries and booking, please contact        us at Jewellery Bliss via call or WhatsApp </Text>
-                </View>
+                    <View style={styles.ProductLogoBackground}>
+                        <Text style={{ marginLeft: moderateScale(10), marginTop: moderateScaleVertical(15), fontSize: textScale(20), fontFamily: "HurmeGeometricSans1SemiBold" }}>Disclaimer : </Text>
+                        <Text style={{ marginLeft: moderateScale(10), marginTop: moderateScaleVertical(6), fontSize: textScale(14), fontFamily: "HurmeGeometricSans1SemiBold" }}>For gold price inquiries and booking, please contact        us at Jewellery Bliss via call or WhatsApp </Text>
+                    </View>
 
-                <ImageBackground style={styles.disclaimer} imageStyle={{ borderRadius: 20 }} source={require("../assets/CompressedTexture3.jpg")} >
-                    <View style={{ marginTop: moderateScaleVertical(15), }}>
-                        <View style={{ flexDirection: "column" ,  justifyContent:"flex-start" , marginLeft:moderateScale(10)}}>
-                            <Text style={{ fontSize: textScale(17), color: "black", fontFamily: "HurmeGeometricSans1SemiBold" }}>Bank Details</Text>
-                            <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>To initiate the order processing, a payment of 15% on the bank details mentioned below</Text>
-                        </View>
-                        <View style={{ flexDirection: "row", marginTop: moderateScaleVertical(3) }}>
-                            <View style={{ flexDirection: "column", marginVertical: moderateScaleVertical(5),  justifyContent:"flex-start" , marginLeft:moderateScale(10) }}>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>Bank Name</Text>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>A/C No.</Text>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>IFSC Code</Text>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>A/c holder name</Text>
+                    <ImageBackground style={styles.disclaimer} imageStyle={{ borderRadius: 20 }} source={require("../assets/CompressedTexture3.jpg")} >
+                        <View style={{ marginTop: moderateScaleVertical(15), }}>
+                            <View style={{ flexDirection: "column", justifyContent: "flex-start", marginLeft: moderateScale(10) }}>
+                                <Text style={{ fontSize: textScale(17), color: "black", fontFamily: "HurmeGeometricSans1SemiBold" }}>Bank Details</Text>
+                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>To initiate the order processing, a payment of 15% on the bank details mentioned below</Text>
                             </View>
-                            <View style={{ flexDirection: "column", marginVertical: moderateScaleVertical(5) }}>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}> : </Text>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}> : </Text>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}> : </Text>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}> : </Text>
+                            <View style={{ flexDirection: "row", marginTop: moderateScaleVertical(3) }}>
+                                <View style={{ flexDirection: "column", marginVertical: moderateScaleVertical(5), justifyContent: "flex-start", marginLeft: moderateScale(10) }}>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>Bank Name</Text>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>A/C No.</Text>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>IFSC Code</Text>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}>A/c holder name</Text>
+                                </View>
+                                <View style={{ flexDirection: "column", marginVertical: moderateScaleVertical(5) }}>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}> : </Text>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}> : </Text>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}> : </Text>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1SemiBold", marginVertical: moderateScaleVertical(2) }}> : </Text>
+                                </View>
+                                <View style={{ flexDirection: "column", marginVertical: moderateScaleVertical(5) }}>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1 ", marginVertical: moderateScaleVertical(2) }}>ICICI</Text>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1 ", marginVertical: moderateScaleVertical(2) }}>629205034031</Text>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1 ", marginVertical: moderateScaleVertical(2) }}>ICIC0006292</Text>
+                                    <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1 ", marginVertical: moderateScaleVertical(2) }}>Adinath Chain and Jewellers{'\n'}E-Comm LLP</Text>
+                                </View>
                             </View>
-                            <View style={{ flexDirection: "column", marginVertical: moderateScaleVertical(5) }}>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1 ", marginVertical: moderateScaleVertical(2) }}>ICICI</Text>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1 ", marginVertical: moderateScaleVertical(2) }}>629205034031</Text>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1 ", marginVertical: moderateScaleVertical(2) }}>ICIC0006292</Text>
-                                <Text style={{ fontSize: textScale(14), color: "black", fontFamily: "HurmeGeometricSans1 ", marginVertical: moderateScaleVertical(2) }}>Adinath Chain and Jewellers{'\n'}E-Comm LLP</Text>
+
+                            <View style={styles.line}></View>
+
+                            <View style={{ flexDirection: "row", marginTop: moderateScaleVertical(5), justifyContent: "flex-start", marginLeft: moderateScale(10) }}>
+                                <Text style={styles.disclaimerText}>Disclaimer : </Text>
+                                <Text style={styles.disclaimerTextValue}>Order will Varied order processing due to{'\n'}product availability, customization, and {'\n'}volume , Thank you for your patience.</Text>
                             </View>
                         </View>
+                    </ImageBackground>
 
-                        <View style={styles.line}></View>
+                    <View>
+                        <Text style={{ fontSize: textScale(30), color: "black", alignSelf: "center", fontFamily: "HurmeGeometricSans1SemiBold", marginTop: moderateScaleVertical(10), marginBottom: moderateScaleVertical(10) }}>OR</Text>
+                        <Text style={{ fontSize: textScale(15), color: "black", alignSelf: "center", fontFamily: "HurmeGeometricSans1SemiBold", marginTop: moderateScaleVertical(10), marginBottom: moderateScaleVertical(10) }}>SCAN THE CODE</Text>
+                    </View>
 
-                        <View style={{ flexDirection: "row", marginTop: moderateScaleVertical(5),justifyContent:"flex-start" , marginLeft:moderateScale(10)  }}>
-                            <Text style={styles.disclaimerText}>Disclaimer : </Text>
-                            <Text style={styles.disclaimerTextValue}>Order will Varied order processing due to{'\n'}product availability, customization, and {'\n'}volume , Thank you for your patience.</Text>
+                    <View>
+                        {/* <Image style={{ marginTop:20,  alignSelf: "center", width: moderateScale(380), marginBottom: moderateScaleVertical(60), borderRadius: 20 }} source={require("../assets/ClientQRcode.jpeg")} /> */}
+                    </View>
+
+                    <View style={{ marginBottom: moderateScaleVertical(50), backgroundColor: "#E8E8E8", width: moderateScale(380), alignSelf: "center", borderRadius: 20, height: moderateScaleVertical(300), marginTop: moderateScaleVertical(0) }}>
+                        <View style={{ flexDirection: "column", alignItems: "center", marginVertical: moderateScaleVertical(0), marginTop: moderateScaleVertical(20) }}>
+                            <Image style={{ alignSelf: "center", width: moderateScale(200), height: moderateScaleVertical(200), marginBottom: moderateScaleVertical(10), borderRadius: 5 }} source={require("../assets/HDqrCode.jpeg")} />
+                            <View style={{ flexDirection: "row" }}>
+                                <View>
+                                    <Text style={{ fontSize: textScale(14), fontFamily: "HurmeGeometricSans1Bold" }}>Merchant Name</Text>
+                                    <Text style={{ marginTop: moderateScaleVertical(20), fontSize: textScale(14), fontFamily: "HurmeGeometricSans1" }}>Mobile Number</Text>
+                                </View>
+                                <View>
+                                    <Text style={{ fontSize: textScale(14) }}> : </Text>
+                                    <Text style={{ marginTop: moderateScaleVertical(20), fontSize: textScale(14) }}> : </Text>
+                                </View>
+                                <View>
+                                    <Text style={{ fontSize: textScale(14), fontFamily: "HurmeGeometricSans1" }}>M/S ADINATH CHAIN AND  {'\n'}JEWELLERS E-COMM LLP</Text>
+                                    <Text style={{ fontSize: textScale(14), fontFamily: "HurmeGeometricSans1", marginTop: moderateScaleVertical(3) }} >9654511612</Text>
+                                </View>
+                            </View>
                         </View>
+                    </View>
+
+
+                    {/* </View> */}
+                </ScrollView>
+
+                {/* BottomTabNavigator */}
+                <ImageBackground source={require('../assets/CompressedTexture3.jpg')} imageStyle={{ borderTopLeftRadius: 15, borderTopRightRadius: 15, borderBottomRightRadius: 15, borderBottomLeftRadius: 15, alignSelf: "center" }} style={{ height: moderateScaleVertical(50), width: moderateScale(370), alignSelf: 'center', marginBottom: moderateScale(4) }}>
+                    <View style={{ marginTop: moderateScaleVertical(9), flexDirection: 'row', justifyContent: 'space-around' }}>
+
+                        <TouchableOpacity onPress={() => { navigation.navigate('Drawer') }}>
+                            <Image source={require('../assets/home.png')} style={{ width: moderateScale(35), height: moderateScaleVertical(35), }} />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => { navigation.navigate('cart'); }}>
+                            <Image source={require('../assets/cart.png')} style={{ width: moderateScale(35), height: moderateScaleVertical(35), }} />
+                        </TouchableOpacity>
+
                     </View>
                 </ImageBackground>
+                {/* BottomTabNavigator end */}
 
-                <View>
-                    <Text style={{ fontSize: textScale(30), color: "black", alignSelf: "center", fontFamily: "HurmeGeometricSans1SemiBold", marginTop: moderateScaleVertical(10), marginBottom: moderateScaleVertical(10) }}>OR</Text>
-                    <Text style={{ fontSize: textScale(15), color: "black", alignSelf: "center", fontFamily: "HurmeGeometricSans1SemiBold", marginTop: moderateScaleVertical(10), marginBottom: moderateScaleVertical(10) }}>SCAN THE CODE</Text>
-                </View>
-
-                <View>
-                    {/* <Image style={{ marginTop:20,  alignSelf: "center", width: moderateScale(380), marginBottom: moderateScaleVertical(60), borderRadius: 20 }} source={require("../assets/ClientQRcode.jpeg")} /> */}
-                </View>
-
-<View style={{marginBottom:moderateScaleVertical(50), backgroundColor:"#E8E8E8" ,width:moderateScale(380), alignSelf: "center", borderRadius:20 , height:moderateScaleVertical(300), marginTop:moderateScaleVertical(0)}}>
-    <View style={{flexDirection:"column" , alignItems:"center" , marginVertical:moderateScaleVertical(0), marginTop:moderateScaleVertical(20)}}>
-    <Image style={{ alignSelf: "center", width: moderateScale(200), height:moderateScaleVertical(200), marginBottom: moderateScaleVertical(10), borderRadius: 5}} source={require("../assets/HDqrCode.jpeg")} />
-    <View style={{flexDirection:"row" }}>
-      <View>
-         <Text style={{fontSize:textScale(14) ,fontFamily: "HurmeGeometricSans1Bold"}}>Merchant Name</Text>
-         <Text style={{marginTop:moderateScaleVertical(20), fontSize:textScale(14),fontFamily: "HurmeGeometricSans1"}}>Mobile Number</Text>
-      </View>
-      <View>
-        <Text style={{fontSize:textScale(14)}}> : </Text>
-        <Text style={{marginTop:moderateScaleVertical(20),fontSize:textScale(14)}}> : </Text>
-      </View>
-      <View>
-        <Text style={{fontSize:textScale(14), fontFamily: "HurmeGeometricSans1"}}>M/S ADINATH CHAIN AND  {'\n'}JEWELLERS E-COMM LLP</Text>
-        <Text style={{fontSize:textScale(14), fontFamily: "HurmeGeometricSans1",marginTop:moderateScaleVertical(3)}} >9654511612</Text>
-      </View> 
-    </View>
-    </View>
-</View> 
-
-
-                {/* </View> */}
-            </ScrollView>
-
-            {/* BottomTabNavigator */}
-            <ImageBackground source={require('../assets/CompressedTexture3.jpg')} imageStyle={{ borderTopLeftRadius: 15, borderTopRightRadius: 15, borderBottomRightRadius: 15, borderBottomLeftRadius: 15, alignSelf: "center" }} style={{ height: moderateScaleVertical(50), width: moderateScale(370), alignSelf: 'center', marginBottom: moderateScale(4) }}>
-                <View style={{ marginTop: moderateScaleVertical(9), flexDirection: 'row', justifyContent: 'space-around' }}>
-
-                    <TouchableOpacity onPress={() => { navigation.navigate('Drawer') }}>
-                        <Image source={require('../assets/home.png')} style={{ width: moderateScale(35), height: moderateScaleVertical(35), }} />
+                {/* Whatsapp start */}
+                <View style={{ bottom: moderateScaleVertical(-42), position: 'absolute', right: moderateScale(5) }}>
+                    <TouchableOpacity onPress={() => changeModalVisible(true)} style={styles.HelpButtonAlignment}>
+                        <View style={styles.icontextAlignment}>
+                            <Image source={require('../assets/whatsapp-white.png')} style={styles.whatsappIcon} />
+                            <Text style={styles.helpText}>Help</Text>
+                        </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => { navigation.navigate('cart'); }}>
-                        <Image source={require('../assets/cart.png')} style={{ width: moderateScale(35), height: moderateScaleVertical(35), }} />
-                    </TouchableOpacity>
-
+                    <Modal transparent={true} animationType="fade" visible={isModalVisible} nRequestClose={() => changeModalVisible(false)}>
+                        <SimpleModal changeModalVisible={changeModalVisible} setData={setData} />
+                    </Modal>
                 </View>
+                {/* Whatsapp end */}
             </ImageBackground>
-             {/* BottomTabNavigator end */}
-
-            {/* Whatsapp start */}
-            <View style={{ bottom: moderateScaleVertical(-42), position: 'absolute', right: moderateScale(5) }}>
-                <TouchableOpacity onPress={() => changeModalVisible(true)} style={styles.HelpButtonAlignment}>
-                    <View style={styles.icontextAlignment}>
-                        <Image source={require('../assets/whatsapp-white.png')} style={styles.whatsappIcon} />
-                        <Text style={styles.helpText}>Help</Text>
-                    </View>
-                </TouchableOpacity>
-
-                <Modal transparent={true} animationType="fade" visible={isModalVisible} nRequestClose={() => changeModalVisible(false)}>
-                    <SimpleModal changeModalVisible={changeModalVisible} setData={setData} />
-                </Modal>
-            </View>
-            {/* Whatsapp end */}
-        </ImageBackground>
         </SafeAreaView>
     )
 }
@@ -754,7 +822,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         marginTop: moderateScaleVertical(20),
         borderRadius: 15,
-        alignItems:"center"
+        alignItems: "center"
 
     },
     line: {
@@ -857,7 +925,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         borderRadius: 20
     },
-    qrcodetext:{
+    qrcodetext: {
 
     }
 
