@@ -11,7 +11,7 @@ const ManageOrder = ({ navigation }) => {
     const { logout, userToken, userInfo } = useContext(AuthContext);
     console.log(userToken)
     const [orderHistory, setOrderHistory] = useState([]);
-    const API_URL = 'https://jewellery-bliss.onrender.com/api/checkouts/order';
+    const API_URL = '${BASE_URL}api/checkouts/order';
 
     useEffect(() => {
         fetchOrderHistory();
