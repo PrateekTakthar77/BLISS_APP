@@ -495,7 +495,7 @@ const ConfirmOrder = ({ navigation }) => {
     // API FOR PREMIUM PRICE
 
     const [premiumData, setPremiumData] = useState([]);
-    const PREMIUM_API_URL = 'https://jewellery-bliss.onrender.com/api/premium';
+    const PREMIUM_API_URL = '${BASE_URL}api/premium';
 
     const fetchPremiumData = async () => {
         try {
