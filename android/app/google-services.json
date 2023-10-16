@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "363484679924",
+    "project_id": "jewellery-bliss",
+    "storage_bucket": "jewellery-bliss.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:363484679924:android:477a3854941c62433618a1",
+        "android_client_info": {
+          "package_name": "com.jewelleryBliss"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGXRFHTHxLBm54ChHcz7ZK7W83Rxew_DM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
